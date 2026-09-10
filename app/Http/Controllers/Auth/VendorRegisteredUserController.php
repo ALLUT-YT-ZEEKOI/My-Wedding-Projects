@@ -14,14 +14,14 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class RegisteredUserController extends Controller
+class VendorRegisteredUserController extends Controller
 {
     /**
      * Display the registration view.
      */
     public function create(): Response
     {
-        return Inertia::render('Auth/Register');
+        return Inertia::render('Auth/VendorRegister');
     }
 
     /**
@@ -35,21 +35,29 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'business_name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'customer',
+            'role' => 'vendor',
         ]);
         
-        $user->assignRole('Customer');
+        $user->assignRole('Vendor');
+        
+        $user->vendorProfile()->create([
+            'business_name' => $request->business_name,
+            'phone' => $request->phone,
+            'verification_status' => 'pending',
+        ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('customer.dashboard', absolute: false));
+        return redirect(route('vendor.subscription.choose', absolute: false));
     }
 }

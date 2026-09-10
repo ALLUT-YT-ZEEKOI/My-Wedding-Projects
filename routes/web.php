@@ -112,37 +112,45 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
 
 // --- VENDOR PANEL ---
 Route::middleware(['auth', 'role:Vendor'])->prefix('vendor')->name('vendor.')->group(function () {
-    Route::get('/dashboard', [VendorDashboardController::class, 'index'])->name('dashboard');
-
-    // Subscription
-    Route::get('/subscription/choose', [SubscriptionController::class, 'choose'])->name('subscription.choose');
-    Route::post('/subscription/process', [SubscriptionController::class, 'processDummyPayment'])->name('subscription.process');
     
-    // Hall Management
-    Route::get('/halls', [VendorHallController::class, 'index'])->name('halls.index');
-    Route::get('/halls/create', [VendorHallController::class, 'create'])->name('halls.create');
-    Route::post('/halls', [VendorHallController::class, 'store'])->name('halls.store');
-    Route::get('/halls/{id}/edit', [VendorHallController::class, 'edit'])->name('halls.edit');
-    Route::put('/halls/{id}', [VendorHallController::class, 'update'])->name('halls.update');
-    Route::delete('/halls/{id}', [VendorHallController::class, 'destroy'])->name('halls.destroy');
-    Route::get('/halls/{id}/preview', [VendorHallController::class, 'preview'])->name('halls.preview');
-    Route::post('/halls/custom-amenity', [VendorHallController::class, 'storeCustomAmenity'])->name('halls.custom-amenity');
+    // Unapproved Vendor Route
+    Route::get('/pending', function () {
+        return Inertia::render('Vendor/PendingApproval');
+    })->name('pending');
 
-    // Availability Calendar
-    Route::get('/availability', [VendorAvailabilityController::class, 'index'])->name('availability.index');
-    Route::post('/availability/block', [VendorAvailabilityController::class, 'block'])->name('availability.block');
-    Route::post('/availability/unblock', [VendorAvailabilityController::class, 'unblock'])->name('availability.unblock');
+    Route::middleware(['vendor.approved'])->group(function () {
+        Route::get('/dashboard', [VendorDashboardController::class, 'index'])->name('dashboard');
 
-    // Bookings
-    Route::get('/bookings', [VendorBookingController::class, 'index'])->name('bookings.index');
-    Route::post('/bookings/offline', [VendorBookingController::class, 'storeOffline'])->name('bookings.offline');
-    Route::post('/bookings/{id}/status', [VendorBookingController::class, 'updateStatus'])->name('bookings.status');
+        // Subscription
+        Route::get('/subscription/choose', [SubscriptionController::class, 'choose'])->name('subscription.choose');
+        Route::post('/subscription/process', [SubscriptionController::class, 'processDummyPayment'])->name('subscription.process');
+        
+        // Hall Management
+        Route::get('/halls', [VendorHallController::class, 'index'])->name('halls.index');
+        Route::get('/halls/create', [VendorHallController::class, 'create'])->name('halls.create');
+        Route::post('/halls', [VendorHallController::class, 'store'])->name('halls.store');
+        Route::get('/halls/{id}/edit', [VendorHallController::class, 'edit'])->name('halls.edit');
+        Route::put('/halls/{id}', [VendorHallController::class, 'update'])->name('halls.update');
+        Route::delete('/halls/{id}', [VendorHallController::class, 'destroy'])->name('halls.destroy');
+        Route::get('/halls/{id}/preview', [VendorHallController::class, 'preview'])->name('halls.preview');
+        Route::post('/halls/custom-amenity', [VendorHallController::class, 'storeCustomAmenity'])->name('halls.custom-amenity');
 
-    // Customers
-    Route::get('/customers', [VendorCustomerController::class, 'index'])->name('customers.index');
+        // Availability Calendar
+        Route::get('/availability', [VendorAvailabilityController::class, 'index'])->name('availability.index');
+        Route::post('/availability/block', [VendorAvailabilityController::class, 'block'])->name('availability.block');
+        Route::post('/availability/unblock', [VendorAvailabilityController::class, 'unblock'])->name('availability.unblock');
 
-    // Finance & Revenue
-    Route::get('/finance', [VendorFinanceController::class, 'index'])->name('finance.index');
+        // Bookings
+        Route::get('/bookings', [VendorBookingController::class, 'index'])->name('bookings.index');
+        Route::post('/bookings/offline', [VendorBookingController::class, 'storeOffline'])->name('bookings.offline');
+        Route::post('/bookings/{id}/status', [VendorBookingController::class, 'updateStatus'])->name('bookings.status');
+
+        // Customers
+        Route::get('/customers', [VendorCustomerController::class, 'index'])->name('customers.index');
+
+        // Finance & Revenue
+        Route::get('/finance', [VendorFinanceController::class, 'index'])->name('finance.index');
+    });
 });
 
 // --- CUSTOMER PANEL ---

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxeHalls Project Features</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #e11d48;
+            font-size: 2.5em;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #0f172a;
+            margin-top: 40px;
+            font-size: 1.8em;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 15px;
+            padding-left: 20px;
+            position: relative;
+        }
+        li:before {
+            content: "•";
+            color: #e11d48;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        strong {
+            color: #0f172a;
+        }
+        @media print {
+            body {
+                padding: 0;
+                font-size: 12pt;
+            }
+            h1 {
+                page-break-before: avoid;
+            }
+            h2 {
+                page-break-after: avoid;
+            }
+            li {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>LuxeHalls Project Features Summary</h1>
+    <p><strong>Project Overview:</strong> A premium, multi-tenant marketplace platform for luxury event spaces and banquet halls, featuring a highly aesthetic, modern UI.</p>
+
+    <h2>1. Customer Features (Frontend)</h2>
+    <ul>
+        <li><strong>Aesthetic UI/UX:</strong> Completely redesigned homepage with a minimalist, luxury aesthetic, glassmorphic elements, and editorial typography.</li>
+        <li><strong>Advanced Search:</strong> Floating search bar allowing customers to search seamlessly by exact <strong>Location</strong> and <strong>Date</strong>.</li>
+        <li><strong>Venue Collection:</strong> Replaced standard lists/maps with a premium Magazine-style Grid layout for browsing venues.</li>
+        <li><strong>Favorites & Wishlist:</strong> Customers can favourite halls and save them to their wishlist for later review.</li>
+        <li><strong>Detailed Profiles:</strong> Customers can view comprehensive hall profiles including pricing, policies, capacity breakdown, and photo galleries.</li>
+    </ul>
+
+    <h2>2. Vendor Features (Vendor Panel)</h2>
+    <ul>
+        <li><strong>Premium Onboarding:</strong> Split-screen luxury UI for Vendor Login and Registration.</li>
+        <li><strong>Approval Workflow:</strong> New vendors are placed in a "Pending Approval" state until verified by the Super Admin.</li>
+        <li><strong>Venue Management:</strong> Vendors can add, edit, and preview their halls.</li>
+        <li><strong>Accurate Search Indexing:</strong> When adding a hall, vendors specify a strict "Searchable Location / City" ensuring their venue accurately appears in customer searches.</li>
+        <li><strong>Granular Controls:</strong> Vendors manage seating/floating capacities, morning/evening/full-day slot pricing, and strict venue policies (catering, music, etc.).</li>
+        <li><strong>Subscription Tiers:</strong> Vendors choose from tiered subscription plans (e.g., Free, Premium) that limit the number of halls they can list.</li>
+        <li><strong>Dashboard & Analytics:</strong> View upcoming bookings, revenue, and customer inquiries.</li>
+    </ul>
+
+    <h2>3. Super Admin Features (Admin Panel)</h2>
+    <ul>
+        <li><strong>Vendor Approvals:</strong> Dedicated queue to review and approve newly registered vendor accounts.</li>
+        <li><strong>Platform Analytics:</strong> Real-time dashboard tracking Total Revenue, Active Vendors, Total Halls, and Monthly Bookings.</li>
+        <li><strong>Master Data Management:</strong> Full control over global variables such as Amenities, Event Types, and Subscription Plan limits/pricing.</li>
+        <li><strong>User Management:</strong> Oversee all customers, vendors, and internal staff roles.</li>
+        <li><strong>Comprehensive Reports:</strong> Generate and view financial and operational reports across the entire platform.</li>
+    </ul>
+</body>
+</html>

@@ -72,11 +72,21 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $isVendor = false;
+        
+        if (Auth::check() && Auth::user()->hasRole('Vendor')) {
+            $isVendor = true;
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
+
+        if ($isVendor) {
+            return redirect(route('vendor.login'));
+        }
 
         return redirect('/');
     }

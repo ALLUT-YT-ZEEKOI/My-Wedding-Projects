@@ -17,7 +17,7 @@ export default function Edit({ hall, allAmenities }) {
         contact_number: hall.contact_number || '',
         email: hall.email || '',
         address: hall.address || '',
-        city: hall.city || 'Mumbai',
+        city: hall.city || '',
         area: hall.area || '',
         pincode: hall.pincode || '',
         map_url: hall.map_url || '',
@@ -182,12 +182,13 @@ export default function Edit({ hall, allAmenities }) {
                                 <TextInput className="mt-1 block w-full" value={data.address} onChange={e => setData('address', e.target.value)} />
                             </div>
                             <div>
-                                <InputLabel value="City *" />
-                                <TextInput className="mt-1 block w-full" value={data.city} onChange={e => setData('city', e.target.value)} required />
+                                <InputLabel value="Searchable Location / City *" />
+                                <TextInput className="mt-1 block w-full" value={data.city} onChange={e => setData('city', e.target.value)} placeholder="e.g. Kochi, Ernakulam" required />
+                                <p className="text-[10px] text-slate-500 mt-1">Customers will search for your hall using this location.</p>
                             </div>
                             <div>
-                                <InputLabel value="Area / Locality" />
-                                <TextInput className="mt-1 block w-full" value={data.area} onChange={e => setData('area', e.target.value)} />
+                                <InputLabel value="Specific Area / Landmark" />
+                                <TextInput className="mt-1 block w-full" value={data.area} onChange={e => setData('area', e.target.value)} placeholder="e.g. Edappally, Kakkanad" />
                             </div>
                             <div>
                                 <InputLabel value="Google Map Embed / Link URL" />

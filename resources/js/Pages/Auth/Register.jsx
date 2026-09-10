@@ -11,8 +11,6 @@ export default function Register() {
         email: '',
         password: '',
         password_confirmation: '',
-        business_name: '',
-        phone: '',
     });
 
     const submit = (e) => {
@@ -60,39 +58,6 @@ export default function Register() {
                     />
 
                     <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="business_name" value="Business Name" />
-
-                    <TextInput
-                        id="business_name"
-                        name="business_name"
-                        value={data.business_name}
-                        className="mt-1 block w-full"
-                        autoComplete="organization"
-                        onChange={(e) => setData('business_name', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.business_name} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="phone" value="Phone Number" />
-
-                    <TextInput
-                        id="phone"
-                        type="tel"
-                        name="phone"
-                        value={data.phone}
-                        className="mt-1 block w-full"
-                        autoComplete="tel"
-                        onChange={(e) => setData('phone', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.phone} className="mt-2" />
                 </div>
 
                 <div className="mt-4">

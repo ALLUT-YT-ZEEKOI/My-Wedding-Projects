@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
 Route::post('register', [RegisteredUserController::class, 'store']);
 
+Route::get('vendor/register', [\App\Http\Controllers\Auth\VendorRegisteredUserController::class, 'create'])->name('vendor.register');
+Route::post('vendor/register', [\App\Http\Controllers\Auth\VendorRegisteredUserController::class, 'store']);
+
 Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
 Route::post('login', [AuthenticatedSessionController::class, 'store']);
 

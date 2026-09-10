@@ -14,7 +14,7 @@ export default function Create({ allAmenities }) {
         contact_number: '',
         email: '',
         address: '',
-        city: 'Mumbai',
+        city: '',
         area: '',
         pincode: '',
         map_url: '',
@@ -152,24 +152,26 @@ export default function Create({ allAmenities }) {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="city" value="City *" />
+                                <InputLabel htmlFor="city" value="Searchable Location / City *" />
                                 <TextInput
                                     id="city"
                                     className="mt-1 block w-full"
                                     value={data.city}
                                     onChange={(e) => setData('city', e.target.value)}
+                                    placeholder="e.g. Kochi, Ernakulam"
                                     required
                                 />
+                                <p className="text-[10px] text-slate-500 mt-1">Customers will search for your hall using this location.</p>
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="area" value="Area / Locality" />
+                                <InputLabel htmlFor="area" value="Specific Area / Landmark" />
                                 <TextInput
                                     id="area"
                                     className="mt-1 block w-full"
                                     value={data.area}
                                     onChange={(e) => setData('area', e.target.value)}
-                                    placeholder="e.g. Andheri West"
+                                    placeholder="e.g. Edappally, Kakkanad"
                                 />
                             </div>
                         </div>
