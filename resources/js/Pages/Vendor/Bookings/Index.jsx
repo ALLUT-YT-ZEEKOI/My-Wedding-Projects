@@ -1,16 +1,25 @@
 import VendorLayout from '@/Layouts/VendorLayout';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function BookingsIndex({ bookings, activeStatusFilter }) {
     const [selectedBooking, setSelectedBooking] = useState(null);
-    const { post, processing } = useForm();
+    const [isUpdating, setIsUpdating] = useState(false);
 
     const handleStatusUpdate = (id, newStatus) => {
-        post(route('vendor.bookings.status', id), {
-            data: { status: newStatus },
-            onSuccess: () => setSelectedBooking(null)
-        });
+        setIsUpdating(true);
+        router.post(
+            route('vendor.bookings.status', id),
+            { status: newStatus },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setSelectedBooking(null);
+                    setIsUpdating(false);
+                },
+                onError: () => setIsUpdating(false),
+            }
+        );
     };
 
     const statusFilters = ['all', 'pending', 'confirmed', 'completed', 'cancelled', 'rejected'];
@@ -97,7 +106,7 @@ export default function BookingsIndex({ bookings, activeStatusFilter }) {
                                         <td className="px-6 py-4 whitespace-nowrap text-right">
                                             <button
                                                 onClick={() => setSelectedBooking(b)}
-                                                className="px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold text-xs hover:bg-slate-800"
+                                                className="px-3 py-1.5 rounded-lg bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 cursor-pointer"
                                             >
                                                 View & Manage &rarr;
                                             </button>
@@ -119,7 +128,7 @@ export default function BookingsIndex({ bookings, activeStatusFilter }) {
                                 <span className="text-xs font-bold uppercase text-indigo-600">Booking #{selectedBooking.booking_code}</span>
                                 <h3 className="text-xl font-extrabold text-slate-900">{selectedBooking.customer_name}</h3>
                             </div>
-                            <button onClick={() => setSelectedBooking(null)} className="text-slate-400 hover:text-slate-700 font-bold">✕</button>
+                            <button onClick={() => setSelectedBooking(null)} className="text-slate-400 hover:text-slate-700 font-bold cursor-pointer">✕</button>
                         </div>
 
                         <div className="space-y-4 text-xs">
@@ -148,29 +157,29 @@ export default function BookingsIndex({ bookings, activeStatusFilter }) {
                                 <div className="grid grid-cols-2 gap-2">
                                     <button
                                         onClick={() => handleStatusUpdate(selectedBooking.id, 'confirmed')}
-                                        disabled={processing}
-                                        className="py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs"
+                                        disabled={isUpdating}
+                                        className="py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs cursor-pointer disabled:opacity-50 transition-colors"
                                     >
                                         Confirm Booking
                                     </button>
                                     <button
                                         onClick={() => handleStatusUpdate(selectedBooking.id, 'completed')}
-                                        disabled={processing}
-                                        className="py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs"
+                                        disabled={isUpdating}
+                                        className="py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs cursor-pointer disabled:opacity-50 transition-colors"
                                     >
                                         Mark Completed
                                     </button>
                                     <button
                                         onClick={() => handleStatusUpdate(selectedBooking.id, 'rejected')}
-                                        disabled={processing}
-                                        className="py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs"
+                                        disabled={isUpdating}
+                                        className="py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs cursor-pointer disabled:opacity-50 transition-colors"
                                     >
                                         Reject Request
                                     </button>
                                     <button
                                         onClick={() => handleStatusUpdate(selectedBooking.id, 'cancelled')}
-                                        disabled={processing}
-                                        className="py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs"
+                                        disabled={isUpdating}
+                                        className="py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs cursor-pointer disabled:opacity-50 transition-colors"
                                     >
                                         Cancel Booking
                                     </button>

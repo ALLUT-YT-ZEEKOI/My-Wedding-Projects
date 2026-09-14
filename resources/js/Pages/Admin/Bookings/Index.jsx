@@ -1,12 +1,19 @@
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
+import { useState } from 'react';
 
 export default function Index({ bookings = [], currentFilter = 'all' }) {
-    const { post, processing } = useForm();
+    const [isCancelling, setIsCancelling] = useState(false);
 
     const handleCancel = (id) => {
         const reason = prompt('Cancellation reason (optional):');
-        post(route('admin.bookings.cancel', id), { data: { reason } });
+        if (reason === null) return;
+        setIsCancelling(true);
+        router.post(
+            route('admin.bookings.cancel', id),
+            { reason },
+            { preserveScroll: true, onFinish: () => setIsCancelling(false) }
+        );
     };
 
     const filterOptions = ['all', 'confirmed', 'pending', 'completed', 'cancelled'];

@@ -1,32 +1,32 @@
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { useState } from 'react';
 
 export default function Review({ hall }) {
-    const { post, processing } = useForm();
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [actionModal, setActionModal] = useState(null); // 'request_changes' | 'reject'
     const [reason, setReason] = useState('');
 
     const handleApprove = () => {
-        post(route('admin.halls.approve', hall.id));
+        setIsSubmitting(true);
+        router.post(route('admin.halls.approve', hall.id), {}, { onFinish: () => setIsSubmitting(false) });
     };
 
     const handleActionSubmit = (e) => {
         e.preventDefault();
         if (!reason.trim()) return;
 
-        if (actionModal === 'request_changes') {
-            post(route('admin.halls.request-changes', hall.id), {
-                data: { reason },
+        setIsSubmitting(true);
+        const routeName = actionModal === 'request_changes' ? 'admin.halls.request-changes' : 'admin.halls.reject';
+        router.post(
+            route(routeName, hall.id),
+            { reason },
+            {
                 onSuccess: () => setActionModal(null),
-            });
-        } else if (actionModal === 'reject') {
-            post(route('admin.halls.reject', hall.id), {
-                data: { reason },
-                onSuccess: () => setActionModal(null),
-            });
-        }
+                onFinish: () => setIsSubmitting(false),
+            }
+        );
     };
 
     return (

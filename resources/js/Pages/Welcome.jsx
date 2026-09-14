@@ -1,441 +1,289 @@
 import CustomerLayout from '@/Layouts/CustomerLayout';
-import { Head, Link, useForm, router, usePage } from '@inertiajs/react';
-import { useState, useRef, useEffect } from 'react';
+import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Welcome({ popularHalls = [], featuredHalls = [], offers = [], reviews = [], cities = [] }) {
-    const user = usePage().props.auth?.user;
-    const [activeSection, setActiveSection] = useState(null); // 'where', 'when', null
-    const [dateTab, setDateTab] = useState('dates');
-    const [flexRange, setFlexRange] = useState('exact');
-    const [activeCategory, setActiveCategory] = useState('all');
-
+export default function Welcome({ popularHalls = [], featuredHalls = [], offers = [], reviews = [] }) {
     const { data, setData, get } = useForm({
         location: '',
         date: '',
-        sort: 'recommended',
+        guests: '100',
+        event_type: 'Wedding',
     });
-
-    const searchRef = useRef(null);
-
-    // Close popups on outside click
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (searchRef.current && !searchRef.current.contains(event.target)) {
-                setActiveSection(null);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
 
     const handleSearch = (e) => {
-        if (e) e.preventDefault();
-        setActiveSection(null);
-        get(route('halls.index'), {
-            preserveState: true,
-            preserveScroll: true,
-        });
+        e.preventDefault();
+        get(route('halls.index'));
     };
 
-    // Location suggestions
-    const locations = [
-        { title: 'Kochi (Ernakulam)', desc: 'Commercial Capital, Kerala', icon: '📍' },
-        { title: 'Thiruvananthapuram', desc: 'Capital Territory, Kerala', icon: '🏡' },
-        { title: 'Cochin International Airport (COK)', desc: 'Airport Convention Venues', icon: '✈️' },
-        { title: 'Thrissur', desc: 'Cultural Capital, Kerala', icon: '📍' },
-        { title: 'Nearby', desc: 'Hotels & halls near your location', icon: '📍' },
+    const eventTypes = [
+        {
+            name: 'Wedding',
+            icon: '💒',
+            count: '450+ Venues',
+            img: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
+        },
+        {
+            name: 'Reception',
+            icon: '🥂',
+            count: '320+ Venues',
+            img: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80',
+        },
+        {
+            name: 'Engagement',
+            icon: '💍',
+            count: '210+ Venues',
+            img: 'https://images.unsplash.com/photo-1532712938736-59b13998816f?auto=format&fit=crop&w=800&q=80',
+        },
+        {
+            name: 'Corporate',
+            icon: '🏢',
+            count: '150+ Venues',
+            img: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=800&q=80',
+        },
     ];
 
-    // Categories with icons
-    const categories = [
-        { id: 'all', label: 'All Venues', icon: '🌐' },
-        { id: 'banquet', label: 'Banquet Halls', icon: '🏰' },
-        { id: 'lawn', label: 'Lawns & Outdoor', icon: '🌿' },
-        { id: 'heritage', label: 'Heritage Palaces', icon: '🏛️' },
-        { id: 'resort', label: 'Luxury Resorts', icon: '💎' },
-        { id: 'beach', label: 'Beachfront', icon: '⛵' },
-        { id: 'ac', label: 'Air-Conditioned', icon: '❄️' },
-        { id: 'poolside', label: 'Poolside Venues', icon: '🏊' },
-    ];
-
-    const septemberDays = Array.from({ length: 30 }, (_, i) => i + 1);
-    const octoberDays = Array.from({ length: 31 }, (_, i) => i + 1);
-
-    // Responsive Filtering Pipeline on REAL Backend Halls Only
-    const filteredHalls = popularHalls.filter((hall) => {
-        // Location filter
-        const queryLoc = (data.location || '').trim().toLowerCase();
-        if (queryLoc) {
-            const hallText = `${hall.name || ''} ${hall.city || ''} ${hall.area || ''} ${hall.location || ''} ${hall.address || ''}`.toLowerCase();
-            const searchWords = queryLoc.split(/\s+/).filter(w => w.length > 1);
-            const matches = searchWords.some(word => hallText.includes(word));
-            if (!matches) return false;
-        }
-
-        // Category filter
-        if (activeCategory && activeCategory !== 'all') {
-            const cat = activeCategory.toLowerCase();
-            const hallCat = (hall.category || '').toLowerCase();
-            const hallName = (hall.name || '').toLowerCase();
-            const hallType = (hall.hall_type || '').toLowerCase();
-
-            if (cat === 'banquet' && !hallName.includes('banquet') && !hallCat.includes('banquet') && !hallType.includes('banquet')) return false;
-            if (cat === 'lawn' && !hallName.includes('lawn') && !hallName.includes('outdoor') && !hallName.includes('garden') && !hallCat.includes('lawn') && !hallType.includes('lawn')) return false;
-            if (cat === 'heritage' && !hallName.includes('heritage') && !hallName.includes('palace') && !hallCat.includes('heritage') && !hallType.includes('heritage')) return false;
-            if (cat === 'resort' && !hallName.includes('resort') && !hallCat.includes('resort') && !hallType.includes('resort')) return false;
-            if (cat === 'beach' && !hallName.includes('ocean') && !hallName.includes('beach') && !hallCat.includes('beach') && !hallType.includes('beach')) return false;
-            if (cat === 'ac' && !hallName.includes('suite') && !hallName.includes('ac') && !hallName.includes('conditioned') && !hallCat.includes('ac') && !hallType.includes('ac')) return false;
-            if (cat === 'poolside' && !hallName.includes('pool') && !hallCat.includes('poolside') && !hallType.includes('pool')) return false;
-        }
-
-        return true;
-    });
-
-    const isFiltered = Boolean(data.location || data.date || (activeCategory && activeCategory !== 'all'));
-
-    const handleClearFilters = () => {
-        setData('location', '');
-        setData('date', '');
-        setActiveCategory('all');
-        setActiveSection(null);
-    };
+    const hallsToShow = (popularHalls?.length ? popularHalls : featuredHalls) || [];
 
     return (
-        <CustomerLayout activeCategory={activeCategory} onSelectCategory={setActiveCategory}>
-            <Head title="LUXEHALLS | Book Luxury Venues, Halls & Palaces" />
+        <CustomerLayout>
+            <Head title="LUXEHALLS — Premium Event Venues" />
 
-            <div className="min-h-screen bg-white pb-24 text-slate-900 font-sans">
-                
-                {/* AIRBNB EXPANDED SEARCH CONTAINER BAR */}
-                <div className="max-w-[1760px] mx-auto px-4 sm:px-8 lg:px-12 pt-5 pb-6">
-                    <div ref={searchRef} className="relative max-w-4xl mx-auto z-40">
-                        <div
-                            className={`flex flex-col md:flex-row items-center bg-white rounded-full border border-slate-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-all ${
-                                activeSection ? 'ring-2 ring-slate-900/10' : 'hover:shadow-[0_6px_24px_rgba(0,0,0,0.12)]'
-                            }`}
-                        >
-                            {/* WHERE SEGMENT */}
-                            <div
-                                onClick={() => setActiveSection(activeSection === 'where' ? null : 'where')}
-                                className={`flex-1 w-full px-7 py-3.5 rounded-full cursor-pointer transition-all ${
-                                    activeSection === 'where' ? 'bg-white shadow-xl rounded-full' : 'hover:bg-slate-50'
-                                }`}
+            {/* Hero */}
+            <div className="relative min-h-[78vh] flex items-center overflow-hidden bg-slate-900 mt-[-72px] pt-[72px]">
+                <div className="absolute inset-0 z-0">
+                    <img
+                        src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=2000&q=80"
+                        alt="Luxury banquet hall"
+                        className="w-full h-full object-cover opacity-45"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/70 to-slate-900/50" />
+                </div>
+
+                <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between gap-10 py-16">
+                    <div className="flex-1 text-center lg:text-left space-y-5 max-w-xl">
+                        <p className="text-rose-300 text-xs font-bold uppercase tracking-[0.2em]">
+                            Premium Venue Booking
+                        </p>
+                        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.1]">
+                            LUXE<span className="text-rose-400">HALLS</span>
+                        </h1>
+                        <p className="text-lg text-slate-300 font-medium leading-relaxed">
+                            Find and book luxury banquet halls, gardens, and convention centres across Kerala and India.
+                        </p>
+                        <div className="flex flex-wrap gap-3 justify-center lg:justify-start pt-2">
+                            <Link
+                                href={route('halls.index')}
+                                className="px-6 py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm rounded-xl shadow-lg transition-colors"
                             >
-                                <label className="text-[10px] font-black text-slate-800 tracking-wider block uppercase mb-0.5">Where</label>
-                                <input
-                                    type="text"
-                                    placeholder="Search destinations (e.g. Kochi, Trivandrum)"
-                                    value={data.location}
-                                    onChange={(e) => setData('location', e.target.value)}
-                                    onFocus={() => setActiveSection('where')}
-                                    className="w-full bg-transparent border-none p-0 text-sm font-semibold text-slate-900 placeholder-slate-400 focus:ring-0 cursor-pointer truncate"
-                                />
-                            </div>
-
-                            <div className="hidden md:block w-[1px] h-8 bg-slate-200"></div>
-
-                            {/* WHEN SEGMENT */}
-                            <div
-                                onClick={() => setActiveSection(activeSection === 'when' ? null : 'when')}
-                                className={`flex-1 w-full px-7 py-3.5 rounded-full cursor-pointer transition-all flex items-center justify-between gap-3 ${
-                                    activeSection === 'when' ? 'bg-white shadow-xl rounded-full' : 'hover:bg-slate-50'
-                                }`}
+                                Browse All Venues
+                            </Link>
+                            <Link
+                                href={route('register')}
+                                className="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm rounded-xl transition-colors"
                             >
+                                List Your Venue
+                            </Link>
+                        </div>
+                    </div>
+
+                    <div className="w-full max-w-md shrink-0">
+                        <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-2xl border border-slate-100">
+                            <h2 className="text-xl font-black text-slate-900 mb-5">Find Your Venue</h2>
+                            <form onSubmit={handleSearch} className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-black text-slate-800 tracking-wider block uppercase mb-0.5">When</label>
-                                    <p className="text-sm font-semibold text-slate-900 truncate">
-                                        {data.date ? new Date(data.date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : 'Add dates'}
-                                    </p>
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1.5">
+                                        Location
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={data.location}
+                                        onChange={(e) => setData('location', e.target.value)}
+                                        placeholder="Kochi, Edappally, Kakkanad..."
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:ring-rose-500 focus:border-rose-500"
+                                    />
                                 </div>
-
-                                {/* AIRBNB PINK SEARCH BUTTON */}
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleSearch();
-                                    }}
-                                    className="bg-[#FF385C] hover:bg-[#e00b41] text-white px-6 py-3 rounded-full font-bold text-sm flex items-center gap-2 transition-transform hover:scale-105 shadow-md shadow-rose-500/30 shrink-0 cursor-pointer"
-                                >
-                                    <span>🔍</span>
-                                    <span className="hidden sm:inline">Search</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* WHERE POPUP DROPDOWN */}
-                        {activeSection === 'where' && (
-                            <div className="absolute top-full left-0 mt-3 w-full md:w-[480px] bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-2">Popular destinations</p>
-                                <div className="space-y-1">
-                                    {locations.map((loc, idx) => (
-                                        <div
-                                            key={idx}
-                                            onClick={() => {
-                                                const searchCity = loc.title.includes('Kochi') ? 'Kochi' : loc.title.includes('Thiruvananthapuram') ? 'Trivandrum' : loc.title.includes('Thrissur') ? 'Thrissur' : 'Kochi';
-                                                setData('location', searchCity);
-                                                setActiveSection('when');
-                                            }}
-                                            className="flex items-center gap-4 p-3.5 hover:bg-slate-50 rounded-2xl cursor-pointer transition-colors"
-                                        >
-                                            <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-xl shrink-0">
-                                                {loc.icon}
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-slate-900 text-sm">{loc.title}</p>
-                                                <p className="text-xs text-slate-500 font-medium">{loc.desc}</p>
-                                            </div>
-                                        </div>
-                                    ))}
+                                <div>
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1.5">
+                                        Event Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={data.date || ''}
+                                        onChange={(e) => setData('date', e.target.value)}
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:ring-rose-500 focus:border-rose-500"
+                                    />
                                 </div>
-                            </div>
-                        )}
-
-                        {/* WHEN DATE PICKER POPUP */}
-                        {activeSection === 'when' && (
-                            <div className="absolute top-full right-0 mt-3 w-full md:w-[720px] bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                <div className="flex justify-center mb-6">
-                                    <div className="bg-slate-100 p-1 rounded-full flex gap-1">
-                                        <button
-                                            onClick={() => setDateTab('dates')}
-                                            className={`px-6 py-2 rounded-full text-xs font-bold transition-all ${
-                                                dateTab === 'dates' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-600 hover:text-slate-900'
-                                            }`}
-                                        >
-                                            Dates
-                                        </button>
-                                        <button
-                                            onClick={() => setDateTab('flexible')}
-                                            className={`px-6 py-2 rounded-full text-xs font-bold transition-all ${
-                                                dateTab === 'flexible' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-600 hover:text-slate-900'
-                                            }`}
-                                        >
-                                            Flexible
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                                <div className="grid grid-cols-2 gap-3">
                                     <div>
-                                        <h4 className="text-center font-bold text-slate-900 text-sm mb-4">September 2026</h4>
-                                        <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400 mb-2">
-                                            <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-                                        </div>
-                                        <div className="grid grid-cols-7 gap-1 text-center text-xs">
-                                            <span className="p-2"></span><span className="p-2"></span>
-                                            {septemberDays.map((day) => (
-                                                <button
-                                                    key={`sept-${day}`}
-                                                    onClick={() => {
-                                                        const selDate = `2026-09-${String(day).padStart(2, '0')}`;
-                                                        setData('date', selDate);
-                                                        setActiveSection(null);
-                                                    }}
-                                                    className={`p-2 rounded-full hover:bg-slate-100 font-semibold transition-all ${
-                                                        data.date === `2026-09-${String(day).padStart(2, '0')}`
-                                                            ? 'bg-slate-900 text-white hover:bg-slate-900'
-                                                            : 'text-slate-800'
-                                                    }`}
-                                                >
-                                                    {day}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h4 className="text-center font-bold text-slate-900 text-sm mb-4">October 2026</h4>
-                                        <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400 mb-2">
-                                            <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-                                        </div>
-                                        <div className="grid grid-cols-7 gap-1 text-center text-xs">
-                                            <span className="p-2"></span><span className="p-2"></span><span className="p-2"></span><span className="p-2"></span>
-                                            {octoberDays.map((day) => (
-                                                <button
-                                                    key={`oct-${day}`}
-                                                    onClick={() => {
-                                                        const selDate = `2026-10-${String(day).padStart(2, '0')}`;
-                                                        setData('date', selDate);
-                                                        setActiveSection(null);
-                                                    }}
-                                                    className={`p-2 rounded-full hover:bg-slate-100 font-semibold transition-all ${
-                                                        data.date === `2026-10-${String(day).padStart(2, '0')}`
-                                                            ? 'bg-slate-900 text-white hover:bg-slate-900'
-                                                            : 'text-slate-800'
-                                                    }`}
-                                                >
-                                                    {day}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-wrap items-center justify-center gap-2 pt-4 border-t border-slate-100">
-                                    {['Exact dates', '± 1 day', '± 2 days', '± 3 days', '± 7 days', '± 14 days'].map((range, idx) => (
-                                        <button
-                                            key={idx}
-                                            onClick={() => setFlexRange(range)}
-                                            className={`px-4 py-2 rounded-full text-xs font-semibold border transition-all ${
-                                                flexRange === range
-                                                    ? 'border-slate-900 bg-slate-900 text-white'
-                                                    : 'border-slate-200 text-slate-700 hover:border-slate-900'
-                                            }`}
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1.5">
+                                            Guests
+                                        </label>
+                                        <select
+                                            value={data.guests}
+                                            onChange={(e) => setData('guests', e.target.value)}
+                                            className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:ring-rose-500 focus:border-rose-500"
                                         >
-                                            {range}
-                                        </button>
-                                    ))}
+                                            <option value="50">Up to 50</option>
+                                            <option value="100">100+</option>
+                                            <option value="300">300+</option>
+                                            <option value="500">500+</option>
+                                            <option value="1000">1000+</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1.5">
+                                            Event
+                                        </label>
+                                        <select
+                                            value={data.event_type}
+                                            onChange={(e) => setData('event_type', e.target.value)}
+                                            className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:ring-rose-500 focus:border-rose-500"
+                                        >
+                                            <option value="Wedding">Wedding</option>
+                                            <option value="Reception">Reception</option>
+                                            <option value="Engagement">Engagement</option>
+                                            <option value="Corporate">Corporate</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* CATEGORY SCROLLER BAR */}
-                <div className="max-w-[1760px] mx-auto px-4 sm:px-8 lg:px-12 py-3 border-b border-slate-100 mb-8">
-                    <div className="flex items-center justify-between gap-4 overflow-x-auto scrollbar-none">
-                        <div className="flex items-center gap-8 min-w-max">
-                            {categories.map((cat) => (
                                 <button
-                                    key={cat.id}
-                                    onClick={() => setActiveCategory(cat.id)}
-                                    className={`flex flex-col items-center gap-2 py-2 border-b-2 transition-all cursor-pointer ${
-                                        activeCategory === cat.id
-                                            ? 'border-slate-900 text-slate-900 font-bold'
-                                            : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 font-medium'
-                                    }`}
+                                    type="submit"
+                                    className="w-full py-3.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm rounded-xl shadow-md transition-colors mt-1"
                                 >
-                                    <span className="text-2xl leading-none">{cat.icon}</span>
-                                    <span className="text-xs tracking-tight">{cat.label}</span>
+                                    Search Halls
                                 </button>
-                            ))}
-                        </div>
-
-                        <div className="hidden md:flex items-center gap-3 pl-6 border-l border-slate-200 shrink-0">
-                            <button className="flex items-center gap-2 border border-slate-300 rounded-xl px-4 py-2.5 text-xs font-bold hover:border-slate-900 transition-colors cursor-pointer">
-                                <span>🎛️</span> Filters
-                            </button>
+                            </form>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                {/* MAIN VENUES SECTION */}
-                <div className="max-w-[1760px] mx-auto px-4 sm:px-8 lg:px-12 space-y-12">
-                    
-                    {/* DYNAMIC TITLE BAR */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-                        <div>
-                            <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                                {data.location ? (
-                                    <>
-                                        Venues in <span className="text-[#FF385C]">{data.location}</span>
-                                        {data.date && <span className="text-slate-500 font-normal"> · {new Date(data.date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</span>}
-                                    </>
-                                ) : activeCategory !== 'all' ? (
-                                    <>
-                                        {categories.find(c => c.id === activeCategory)?.label || 'Venues'} in Kerala
-                                    </>
-                                ) : (
-                                    <>Popular wedding halls in Kerala →</>
-                                )}
-                            </h2>
-                            <p className="text-xs text-slate-500 font-medium mt-1">
-                                {filteredHalls.length} venue{filteredHalls.length !== 1 ? 's' : ''} available in database
-                            </p>
-                        </div>
-
-                        {/* CLEAR FILTERS BUTTON */}
-                        {isFiltered && (
-                            <button
-                                onClick={handleClearFilters}
-                                className="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-300 hover:border-slate-900 text-xs font-bold text-slate-700 transition-colors cursor-pointer self-start sm:self-auto shrink-0"
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-24">
+                {/* Categories */}
+                <section>
+                    <div className="mb-10 max-w-2xl">
+                        <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Browse by Event</h2>
+                        <p className="text-slate-500 font-medium mt-3">
+                            Explore venues curated for weddings, receptions, engagements, and corporate celebrations.
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        {eventTypes.map((cat) => (
+                            <Link
+                                key={cat.name}
+                                href={route('halls.index', { event_type: cat.name })}
+                                className="group relative h-72 rounded-2xl overflow-hidden shadow-lg"
                             >
-                                <span>✕</span> Clear filters
-                            </button>
-                        )}
+                                <img
+                                    src={cat.img}
+                                    alt={cat.name}
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" />
+                                <div className="absolute bottom-0 left-0 w-full p-6">
+                                    <span className="text-3xl mb-2 block">{cat.icon}</span>
+                                    <h3 className="text-xl font-black text-white">{cat.name}</h3>
+                                    <p className="text-rose-300 font-bold text-sm mt-1">{cat.count}</p>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Popular halls */}
+                <section>
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 gap-4">
+                        <div>
+                            <span className="text-rose-600 font-black tracking-widest uppercase text-xs">Featured</span>
+                            <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight mt-2">
+                                Popular Venues
+                            </h2>
+                        </div>
+                        <Link
+                            href={route('halls.index')}
+                            className="text-sm font-bold text-rose-600 hover:text-rose-500"
+                        >
+                            View all venues →
+                        </Link>
                     </div>
 
-                    {/* VENUE CARD GRID OR EMPTY STATE */}
-                    {filteredHalls.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {filteredHalls.map((hall, idx) => (
-                                <Link key={hall.id || idx} href={route('halls.show', hall.id)} className="group block space-y-3">
-                                    <div className="relative aspect-[20/19] rounded-2xl overflow-hidden bg-slate-100 shadow-sm">
+                    {hallsToShow.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {hallsToShow.slice(0, 6).map((hall) => (
+                                <Link
+                                    key={hall.id}
+                                    href={route('halls.show', hall.id)}
+                                    className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-slate-100 transition-all duration-300"
+                                >
+                                    <div className="relative h-52 overflow-hidden bg-slate-100">
                                         <img
-                                            src={hall.cover_photo || hall.img || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1000&q=80'}
+                                            src={
+                                                hall.cover_photo ||
+                                                'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80'
+                                            }
                                             alt={hall.name}
-                                            onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1000&q=80'; }}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            onError={(e) => {
+                                                e.target.src =
+                                                    'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80';
+                                            }}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                         />
-                                        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-slate-900 shadow-sm border border-slate-200/50">
-                                            Guest favourite
+                                        <div className="absolute top-3 left-3 bg-white/95 px-3 py-1 rounded-lg text-[11px] font-bold text-slate-800 uppercase tracking-wide">
+                                            {hall.hall_type || 'Banquet Hall'}
                                         </div>
-                                        <button className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-md hover:bg-white flex items-center justify-center shadow-sm transition-transform hover:scale-110">
-                                            <span className="text-base text-slate-600">♡</span>
-                                        </button>
                                     </div>
-
-                                    <div className="space-y-1">
-                                        <div className="flex justify-between items-start">
-                                            <h3 className="font-bold text-slate-900 text-base leading-snug group-hover:text-[#FF385C] transition-colors truncate">
-                                                {hall.name}
-                                            </h3>
-                                            <div className="flex items-center gap-1 text-sm font-semibold text-slate-900 shrink-0">
-                                                <span>★</span>
-                                                <span>{hall.rating || '4.98'}</span>
+                                    <div className="p-5 flex-1 flex flex-col">
+                                        <h3 className="text-lg font-black text-slate-900 group-hover:text-rose-600 transition-colors leading-snug">
+                                            {hall.name}
+                                        </h3>
+                                        <p className="text-slate-500 text-sm font-medium mt-1">
+                                            {hall.city || hall.location || 'Kerala'}
+                                            {hall.capacity ? ` · Up to ${Number(hall.capacity).toLocaleString()} guests` : ''}
+                                        </p>
+                                        <div className="mt-auto pt-4 border-t border-slate-100 flex justify-between items-center">
+                                            <div>
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                    From
+                                                </span>
+                                                <span className="text-lg font-black text-slate-900">
+                                                    ₹{(hall.pricing?.base_price || 35000).toLocaleString()}
+                                                </span>
                                             </div>
-                                        </div>
-                                        <p className="text-slate-500 text-sm font-medium">{hall.city || (hall.area ? `${hall.area}, ${hall.city}` : 'Kerala')}</p>
-                                        <p className="text-slate-500 text-sm font-medium">Up to {(hall.capacity || 1000).toLocaleString()} guests · Available</p>
-                                        <div className="pt-1">
-                                            <span className="font-bold text-slate-900 text-base">
-                                                ₹{(hall.pricing?.base_price || 35000).toLocaleString()}
-                                            </span>
-                                            <span className="text-slate-600 text-sm font-normal"> / event</span>
+                                            <span className="text-sm font-bold text-rose-600">View →</span>
                                         </div>
                                     </div>
                                 </Link>
                             ))}
                         </div>
                     ) : (
-                        /* ELEGANT EMPTY STATE */
-                        <div className="py-16 text-center max-w-md mx-auto space-y-4">
-                            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-3xl mx-auto text-slate-400">
-                                🏰
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900">
-                                No venues found in "{data.location}"
-                            </h3>
-                            <p className="text-slate-500 text-sm">
-                                Try searching for popular Kerala cities or reset your search filters.
-                            </p>
-                            
-                            {/* Suggestion Pills */}
-                            <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-                                {['Kochi', 'Trivandrum', 'Thrissur', 'Ernakulam', 'Kozhikode'].map((city) => (
-                                    <button
-                                        key={city}
-                                        onClick={() => {
-                                            setData('location', city);
-                                            setActiveSection(null);
-                                        }}
-                                        className="px-4 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition-colors cursor-pointer"
-                                    >
-                                        📍 {city}
-                                    </button>
-                                ))}
-                            </div>
-
-                            <div className="pt-4">
-                                <button
-                                    onClick={handleClearFilters}
-                                    className="bg-[#FF385C] text-white px-6 py-2.5 rounded-full font-bold text-xs shadow-md hover:bg-[#e00b41] transition-colors cursor-pointer"
-                                >
-                                    Clear Filters &amp; View All Venues
-                                </button>
-                            </div>
+                        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
+                            <p className="text-slate-500 font-medium">No venues listed yet. Check back soon.</p>
+                            <Link href={route('halls.index')} className="inline-block mt-4 text-rose-600 font-bold text-sm">
+                                Browse halls →
+                            </Link>
                         </div>
                     )}
-                </div>
+                </section>
+
+                {/* CTA */}
+                <section>
+                    <div className="relative rounded-2xl overflow-hidden bg-slate-900 py-16 px-8 text-center">
+                        <div className="absolute inset-0 bg-gradient-to-br from-rose-700 to-amber-600 opacity-90" />
+                        <div className="relative z-10 max-w-2xl mx-auto space-y-5">
+                            <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight">
+                                Own a venue? Partner with us
+                            </h2>
+                            <p className="text-rose-50 text-base font-medium">
+                                List your banquet hall on LuxeHalls and reach couples looking for their perfect celebration space.
+                            </p>
+                            <Link
+                                href={route('register')}
+                                className="inline-block px-8 py-3.5 bg-white text-rose-600 font-bold text-sm rounded-xl shadow-lg hover:bg-slate-50 transition-colors"
+                            >
+                                Become a Host
+                            </Link>
+                        </div>
+                    </div>
+                </section>
             </div>
         </CustomerLayout>
     );
