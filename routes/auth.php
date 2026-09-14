@@ -12,14 +12,14 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 // Login and Registration entrypoints (accessible anytime to allow account switching)
-Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
-Route::post('register', [RegisteredUserController::class, 'store']);
+Route::get('customer/register', [RegisteredUserController::class, 'create'])->name('register');
+Route::post('customer/register', [RegisteredUserController::class, 'store']);
 
 Route::get('vendor/register', [\App\Http\Controllers\Auth\VendorRegisteredUserController::class, 'create'])->name('vendor.register');
 Route::post('vendor/register', [\App\Http\Controllers\Auth\VendorRegisteredUserController::class, 'store']);
 
-Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
-Route::post('login', [AuthenticatedSessionController::class, 'store']);
+Route::get('customer/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+Route::post('customer/login', [AuthenticatedSessionController::class, 'store']);
 
 Route::get('admin/login', [AuthenticatedSessionController::class, 'createAdmin'])->name('admin.login');
 Route::post('admin/login', [AuthenticatedSessionController::class, 'store']);

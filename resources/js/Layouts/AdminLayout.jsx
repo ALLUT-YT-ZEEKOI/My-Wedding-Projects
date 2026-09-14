@@ -98,7 +98,9 @@ export default function AdminLayout({ header, children }) {
                         <div className="flex-1 flex items-center">
                             {header && <div className="text-xl font-bold text-gray-900 tracking-tight">{header}</div>}
                         </div>
-                        <div className="ml-4 flex items-center md:ml-6">
+                        <div className="ml-4 flex items-center md:ml-6 space-x-4">
+                            <Link href={route('login')} className="text-sm font-bold text-slate-500 hover:text-rose-600 transition-colors hidden sm:block">Customer Login</Link>
+                            <Link href={route('register')} className="text-sm font-bold text-slate-500 hover:text-rose-600 transition-colors hidden sm:block">Customer Registration</Link>
                             <Dropdown>
                                 <Dropdown.Trigger>
                                     <span className="inline-flex rounded-md shadow-sm">
@@ -109,6 +111,8 @@ export default function AdminLayout({ header, children }) {
                                     </span>
                                 </Dropdown.Trigger>
                                 <Dropdown.Content>
+                                    <Dropdown.Link href={route('login')}>Customer Login</Dropdown.Link>
+                                    <Dropdown.Link href={route('register')}>Customer Registration</Dropdown.Link>
                                     <Dropdown.Link href={route('profile.edit')}>Profile Settings</Dropdown.Link>
                                     <Dropdown.Link href={route('logout')} method="post" as="button">Log Out</Dropdown.Link>
                                 </Dropdown.Content>

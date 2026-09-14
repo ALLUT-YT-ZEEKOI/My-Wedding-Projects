@@ -116,22 +116,28 @@ export default function VendorLayout({ header, children }) {
                         <div className="flex-1 flex items-center">
                             {header && <div className="text-xl font-bold text-slate-900 tracking-tight">{header}</div>}
                         </div>
-                        <div className="ml-4 flex items-center md:ml-6">
+                        <div className="ml-4 flex items-center md:ml-6 space-x-4">
+                            <Link href={route('login')} className="text-sm font-bold text-slate-500 hover:text-rose-600 transition-colors hidden sm:block">Customer Login</Link>
+                            <Link href={route('register')} className="text-sm font-bold text-slate-500 hover:text-rose-600 transition-colors hidden sm:block">Customer Registration</Link>
                             <Dropdown>
                                 <Dropdown.Trigger>
-                                    <span className="inline-flex rounded-md shadow-xs">
-                                        <button type="button" className="inline-flex items-center px-3 py-2 border border-slate-200 text-sm leading-4 font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition ease-in-out duration-150">
-                                            <div className="h-6 w-6 rounded-full bg-indigo-100 text-indigo-600 font-bold text-xs flex items-center justify-center mr-2">
-                                                {user.name.charAt(0)}
-                                            </div>
+                                    <span className="inline-flex rounded-md shadow-sm">
+                                        <button type="button" className="inline-flex items-center px-3 py-2 border border-slate-300 text-sm leading-4 font-bold rounded-full text-slate-700 bg-white hover:bg-slate-50 hover:text-slate-900 focus:outline-none transition ease-in-out duration-150">
                                             {user.name}
-                                            <svg className="ml-2 -mr-0.5 h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                                            <svg className="ml-2 -mr-0.5 h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
                                         </button>
                                     </span>
                                 </Dropdown.Trigger>
+
                                 <Dropdown.Content>
+                                    <Dropdown.Link href={route('login')}>Customer Login</Dropdown.Link>
+                                    <Dropdown.Link href={route('register')}>Customer Registration</Dropdown.Link>
                                     <Dropdown.Link href={route('profile.edit')}>Profile Settings</Dropdown.Link>
-                                    <Dropdown.Link href={route('logout')} method="post" as="button">Log Out</Dropdown.Link>
+                                    <Dropdown.Link href={route('logout')} method="post" as="button">
+                                        Log Out
+                                    </Dropdown.Link>
                                 </Dropdown.Content>
                             </Dropdown>
                         </div>
