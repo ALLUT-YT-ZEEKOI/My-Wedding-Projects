@@ -15,11 +15,13 @@ class CustomerHallController extends Controller
         $query = Hall::with(['pricing', 'media', 'amenities', 'vendor', 'reviews'])
             ->where('status', 'live');
 
-        // Text Location / City Filter
+        // Text Location / City Filter (name, city, area, address)
         if ($request->filled('location') && !$request->filled('lat')) {
-            $loc = $request->location;
+            $loc = trim($request->location);
             $query->where(function ($q) use ($loc) {
-                $q->where('city', 'like', "%{$loc}%")
+                $q->where('name', 'like', "%{$loc}%")
+                  ->orWhere('city', 'like', "%{$loc}%")
+                  ->orWhere('area', 'like', "%{$loc}%")
                   ->orWhere('location', 'like', "%{$loc}%")
                   ->orWhere('address', 'like', "%{$loc}%");
             });
@@ -29,7 +31,7 @@ class CustomerHallController extends Controller
         if ($request->filled('date')) {
             $date = $request->date;
             // Exclude halls that are completely booked for the day (e.g. full_day confirmed)
-            $query->whereDoesntHave('bookings', function($q) use ($date) {
+            $query->whereDoesntHave('bookings', function ($q) use ($date) {
                 $q->where('event_date', $date)
                   ->where('slot', 'full_day')
                   ->where('status', 'confirmed');
@@ -39,16 +41,45 @@ class CustomerHallController extends Controller
         // Guests Capacity Filter
         if ($request->filled('guests')) {
             $guests = (int) $request->guests;
-            $query->where('capacity', '>=', $guests);
+            $query->where(function ($q) use ($guests) {
+                $q->where('capacity', '>=', $guests)
+                  ->orWhere('max_guests', '>=', $guests)
+                  ->orWhere(function ($inner) use ($guests) {
+                      $inner->whereNull('capacity')->whereNull('max_guests');
+                  });
+            });
         }
 
-        // Event Type
+        // Event type: celebration types match typical venue types (Banquet, Marriage, etc.)
+        // Do NOT require hall_type to literally contain "Wedding" — that hid real halls.
         if ($request->filled('event_type')) {
-            $type = $request->event_type;
-            $query->where(function ($q) use ($type) {
-                $q->where('hall_type', 'like', "%{$type}%")
-                  ->orWhere('description', 'like', "%{$type}%");
-            });
+            $type = strtolower(trim($request->event_type));
+            $celebrationTypes = ['wedding', 'reception', 'engagement'];
+
+            if (in_array($type, $celebrationTypes, true)) {
+                $query->where(function ($q) use ($type) {
+                    $q->where('hall_type', 'like', '%Banquet%')
+                      ->orWhere('hall_type', 'like', '%Marriage%')
+                      ->orWhere('hall_type', 'like', '%Wedding%')
+                      ->orWhere('hall_type', 'like', '%Convention%')
+                      ->orWhere('hall_type', 'like', '%Lawn%')
+                      ->orWhere('hall_type', 'like', '%Garden%')
+                      ->orWhere('hall_type', 'like', '%Resort%')
+                      ->orWhere('hall_type', 'like', '%Palace%')
+                      ->orWhere('hall_type', 'like', '%Hall%')
+                      ->orWhere('description', 'like', "%{$type}%")
+                      ->orWhereNull('hall_type');
+                });
+            } elseif ($type === 'corporate') {
+                $query->where(function ($q) {
+                    $q->where('hall_type', 'like', '%Corporate%')
+                      ->orWhere('hall_type', 'like', '%Convention%')
+                      ->orWhere('hall_type', 'like', '%Banquet%')
+                      ->orWhere('hall_type', 'like', '%Hall%')
+                      ->orWhere('description', 'like', '%corporate%')
+                      ->orWhereNull('hall_type');
+                });
+            }
         }
 
         $halls = $query->get();

@@ -16,7 +16,7 @@ export default function Index({ halls = [], allAmenities = [], filters = {}, fav
 
     const handleSearch = () => {
         get(route('halls.index'), {
-            preserveState: true,
+            preserveState: false,
             preserveScroll: true,
         });
     };
@@ -42,30 +42,22 @@ export default function Index({ halls = [], allAmenities = [], filters = {}, fav
         { id: 'beach', label: 'Beachfront' },
     ];
 
+    // Location / date / guests / event are filtered on the server.
+    // Only apply category chips client-side so we don't hide valid API results.
     const filteredHalls = halls.filter((hall) => {
-        const queryLoc = (data.location || filters.location || '').trim().toLowerCase();
-        if (queryLoc) {
-            const hallText = `${hall.name || ''} ${hall.city || ''} ${hall.area || ''} ${hall.location || ''} ${hall.address || ''}`.toLowerCase();
-            const searchWords = queryLoc.split(/\s+/).filter((w) => w.length > 1);
-            if (searchWords.length && !searchWords.some((word) => hallText.includes(word))) {
-                return false;
-            }
-        }
+        if (!activeCategory || activeCategory === 'all') return true;
 
-        if (activeCategory && activeCategory !== 'all') {
-            const cat = activeCategory.toLowerCase();
-            const hallCat = (hall.category || '').toLowerCase();
-            const hallName = (hall.name || '').toLowerCase();
-            const hallType = (hall.hall_type || '').toLowerCase();
-            const blob = `${hallCat} ${hallName} ${hallType}`;
+        const cat = activeCategory.toLowerCase();
+        const hallCat = (hall.category || '').toLowerCase();
+        const hallName = (hall.name || '').toLowerCase();
+        const hallType = (hall.hall_type || '').toLowerCase();
+        const blob = `${hallCat} ${hallName} ${hallType}`;
 
-            if (cat === 'banquet' && !blob.includes('banquet')) return false;
-            if (cat === 'lawn' && !['lawn', 'outdoor', 'garden'].some((k) => blob.includes(k))) return false;
-            if (cat === 'heritage' && !['heritage', 'palace'].some((k) => blob.includes(k))) return false;
-            if (cat === 'resort' && !blob.includes('resort')) return false;
-            if (cat === 'beach' && !['ocean', 'beach'].some((k) => blob.includes(k))) return false;
-        }
-
+        if (cat === 'banquet') return blob.includes('banquet') || blob.includes('hall');
+        if (cat === 'lawn') return ['lawn', 'outdoor', 'garden'].some((k) => blob.includes(k));
+        if (cat === 'heritage') return ['heritage', 'palace'].some((k) => blob.includes(k));
+        if (cat === 'resort') return blob.includes('resort');
+        if (cat === 'beach') return ['ocean', 'beach'].some((k) => blob.includes(k));
         return true;
     });
 

@@ -102,8 +102,8 @@ export default function Index({ bookings = [], currentFilter = 'all' }) {
                                                 {b.status !== 'cancelled' && (
                                                     <button
                                                         onClick={() => handleCancel(b.id)}
-                                                        disabled={processing}
-                                                        className="px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg text-xs font-semibold border border-red-200 transition"
+                                                        disabled={isCancelling}
+                                                        className="px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg text-xs font-semibold border border-red-200 transition disabled:opacity-50"
                                                     >
                                                         Cancel Booking
                                                     </button>
