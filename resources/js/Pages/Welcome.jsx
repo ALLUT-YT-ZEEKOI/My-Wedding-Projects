@@ -1,5 +1,6 @@
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import LocationAutocompleteInput from '@/Components/LocationAutocompleteInput';
 
 export default function Welcome({ popularHalls = [], featuredHalls = [], offers = [], reviews = [] }) {
     const { data, setData, get } = useForm({
@@ -18,26 +19,30 @@ export default function Welcome({ popularHalls = [], featuredHalls = [], offers 
         {
             name: 'Wedding',
             icon: '💒',
+            tagline: 'Grand Mandaps & Palaces',
             count: '450+ Venues',
-            img: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
+            img: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80',
         },
         {
             name: 'Reception',
             icon: '🥂',
+            tagline: 'Luxury Ballrooms & Dining',
             count: '320+ Venues',
-            img: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80',
+            img: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1000&q=80',
         },
         {
             name: 'Engagement',
             icon: '💍',
+            tagline: 'Intimate Ceremonies & Lawns',
             count: '210+ Venues',
-            img: 'https://images.unsplash.com/photo-1532712938736-59b13998816f?auto=format&fit=crop&w=800&q=80',
+            img: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1000&q=80',
         },
         {
             name: 'Corporate',
             icon: '🏢',
+            tagline: 'Conventions & Auditoriums',
             count: '150+ Venues',
-            img: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=800&q=80',
+            img: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80',
         },
     ];
 
@@ -93,12 +98,11 @@ export default function Welcome({ popularHalls = [], featuredHalls = [], offers 
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1.5">
                                         Location
                                     </label>
-                                    <input
-                                        type="text"
+                                    <LocationAutocompleteInput
                                         value={data.location}
-                                        onChange={(e) => setData('location', e.target.value)}
+                                        onChange={(val) => setData('location', val)}
                                         placeholder="Kochi, Edappally, Kakkanad..."
-                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:ring-rose-500 focus:border-rose-500"
+                                        inputClassName="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:ring-rose-500 focus:border-rose-500"
                                     />
                                 </div>
                                 <div>
@@ -161,28 +165,51 @@ export default function Welcome({ popularHalls = [], featuredHalls = [], offers 
                 {/* Categories */}
                 <section>
                     <div className="mb-10 max-w-2xl">
+                        <span className="text-rose-600 font-black tracking-widest uppercase text-xs block mb-2">
+                            EVENT SELECTION
+                        </span>
                         <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Browse by Event</h2>
-                        <p className="text-slate-500 font-medium mt-3">
-                            Explore venues curated for weddings, receptions, engagements, and corporate celebrations.
+                        <p className="text-slate-500 font-medium mt-2">
+                            Explore luxury venues curated specifically for weddings, receptions, engagements, and corporate celebrations.
                         </p>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {eventTypes.map((cat) => (
                             <Link
                                 key={cat.name}
                                 href={route('halls.index', { event_type: cat.name })}
-                                className="group relative h-72 rounded-2xl overflow-hidden shadow-lg"
+                                className="group relative h-80 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-rose-600/10 transition-all duration-500 border border-slate-100 flex flex-col justify-between p-6"
                             >
                                 <img
                                     src={cat.img}
                                     alt={cat.name}
-                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    onError={(e) => {
+                                        e.target.src = 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1000&q=80';
+                                    }}
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" />
-                                <div className="absolute bottom-0 left-0 w-full p-6">
-                                    <span className="text-3xl mb-2 block">{cat.icon}</span>
-                                    <h3 className="text-xl font-black text-white">{cat.name}</h3>
-                                    <p className="text-rose-300 font-bold text-sm mt-1">{cat.count}</p>
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-900/10 transition-opacity group-hover:opacity-90" />
+
+                                {/* Top Pill */}
+                                <div className="relative z-10 self-start">
+                                    <span className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-slate-900 shadow-sm border border-slate-200/50">
+                                        <span>{cat.icon}</span>
+                                        <span>{cat.count}</span>
+                                    </span>
+                                </div>
+
+                                {/* Bottom Info */}
+                                <div className="relative z-10 space-y-1">
+                                    <h3 className="text-2xl font-black text-white group-hover:text-rose-300 transition-colors">
+                                        {cat.name}
+                                    </h3>
+                                    <p className="text-slate-300 font-medium text-xs">
+                                        {cat.tagline}
+                                    </p>
+                                    <div className="pt-2 flex items-center text-rose-400 font-bold text-xs group-hover:translate-x-1.5 transition-transform">
+                                        <span>Explore Venues</span>
+                                        <span className="ml-1">→</span>
+                                    </div>
                                 </div>
                             </Link>
                         ))}

@@ -168,6 +168,12 @@ class VendorHallController extends Controller
             $data['cover_photo'] = '/storage/' . $path;
         }
 
+        if (isset($data['city']) || isset($data['area'])) {
+            $cityStr = $data['city'] ?? $hall->city;
+            $areaStr = $data['area'] ?? $hall->area;
+            $data['location'] = $cityStr . ($areaStr ? ', ' . $areaStr : '');
+        }
+
         $hall->update($data);
 
         if ($request->has('pricing')) {

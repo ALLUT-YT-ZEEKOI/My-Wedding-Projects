@@ -314,12 +314,38 @@ export default function Show({ hall, isFavourite = false }) {
                                 </div>
                             </div>
 
-                            {/* LOCATION MAP */}
-                            {hall.latitude && hall.longitude && (
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-900 mb-4">Where you'll be</h3>
-                                    <p className="text-slate-500 text-xs font-medium mb-4">{hall.address || hall.area || hall.city}</p>
-                                    <div className="h-72 w-full rounded-3xl overflow-hidden shadow-inner border border-slate-200 relative z-0">
+                            {/* LOCATION & GOOGLE MAPS EMBED */}
+                            <div className="pb-8 space-y-4">
+                                <h3 className="text-xl font-bold text-slate-900">Where you'll be</h3>
+                                <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                    <div>
+                                        <p className="font-bold text-slate-900 text-sm">
+                                            📍 {hall.address || hall.name}
+                                        </p>
+                                        <p className="text-slate-500 text-xs font-medium mt-0.5">
+                                            {hall.area ? `${hall.area}, ` : ''}{hall.city || 'Kerala'} {hall.pincode ? ` - ${hall.pincode}` : ''}
+                                            {hall.landmark ? ` (Near ${hall.landmark})` : ''}
+                                        </p>
+                                    </div>
+                                    <a
+                                        href={
+                                            hall.map_url ||
+                                            `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                                                `${hall.name}, ${hall.address || ''} ${hall.area || ''} ${hall.city || ''}`
+                                            )}`
+                                        }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="px-4 py-2 bg-white border border-slate-200 hover:border-slate-900 text-slate-800 rounded-xl text-xs font-bold shadow-xs flex items-center gap-1.5 transition"
+                                    >
+                                        <span>📍 Open in Google Maps</span>
+                                        <span>↗</span>
+                                    </a>
+                                </div>
+
+                                {/* MAP EMBED OR LEAFLET CONTAINER */}
+                                <div className="h-80 w-full rounded-3xl overflow-hidden shadow-sm border border-slate-200 relative bg-slate-100">
+                                    {hall.latitude && hall.longitude ? (
                                         <MapContainer center={[hall.latitude, hall.longitude]} zoom={15} scrollWheelZoom={false} className="w-full h-full z-0">
                                             <TileLayer
                                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -332,9 +358,25 @@ export default function Show({ hall, isFavourite = false }) {
                                                 </Popup>
                                             </Marker>
                                         </MapContainer>
-                                    </div>
+                                    ) : (
+                                        <iframe
+                                            title="Venue Location Map"
+                                            width="100%"
+                                            height="100%"
+                                            style={{ border: 0 }}
+                                            loading="lazy"
+                                            allowFullScreen
+                                            src={
+                                                hall.map_url && hall.map_url.includes('google.com/maps/embed')
+                                                    ? hall.map_url
+                                                    : `https://maps.google.com/maps?q=${encodeURIComponent(
+                                                          `${hall.name}, ${hall.address || ''} ${hall.area || ''} ${hall.city || 'Kerala'}`
+                                                      )}&t=&z=14&ie=UTF8&iwloc=&output=embed`
+                                            }
+                                        ></iframe>
+                                    )}
                                 </div>
-                            )}
+                            </div>
                         </div>
 
                         {/* RIGHT COLUMN: AIRBNB STICKY RESERVE CARD */}

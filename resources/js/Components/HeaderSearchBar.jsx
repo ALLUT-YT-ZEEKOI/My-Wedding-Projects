@@ -1,3 +1,5 @@
+import LocationAutocompleteInput from '@/Components/LocationAutocompleteInput';
+
 /**
  * Standard venue search form — location + date + submit.
  */
@@ -30,12 +32,10 @@ export default function HeaderSearchBar({
                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-0.5">
                         Location
                     </label>
-                    <input
-                        type="text"
+                    <LocationAutocompleteInput
                         value={location}
-                        onChange={(e) => setLocation(e.target.value)}
+                        onChange={setLocation}
                         placeholder="Kochi, Thrissur, Trivandrum..."
-                        className="w-full text-sm bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-rose-500 focus:border-rose-500 font-semibold px-3 py-2.5"
                     />
                 </div>
 
