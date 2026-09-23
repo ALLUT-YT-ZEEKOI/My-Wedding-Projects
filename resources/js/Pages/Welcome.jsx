@@ -46,7 +46,51 @@ export default function Welcome({ popularHalls = [], featuredHalls = [], offers 
         },
     ];
 
-    const hallsToShow = (popularHalls?.length ? popularHalls : featuredHalls) || [];
+    const sampleVenues = [
+        {
+            id: 'demo-1',
+            name: 'The Grand Imperial Palace',
+            location: 'Kochi, Kerala',
+            city: 'Kochi',
+            capacity: 1500,
+            hall_type: 'Grand Ballroom',
+            cover_photo: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80',
+            pricing: { base_price: 125000 }
+        },
+        {
+            id: 'demo-2',
+            name: 'Lakeside Heritage Resort & Lawns',
+            location: 'Kumarakom, Kottayam',
+            city: 'Kottayam',
+            capacity: 800,
+            hall_type: 'Waterfront Lawn',
+            cover_photo: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1000&q=80',
+            pricing: { base_price: 110000 }
+        },
+        {
+            id: 'demo-3',
+            name: 'Emerald Bay Convention Resort',
+            location: 'Kozhikode, Kerala',
+            city: 'Kozhikode',
+            capacity: 1000,
+            hall_type: 'Convention Centre',
+            cover_photo: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80',
+            pricing: { base_price: 85000 }
+        },
+        {
+            id: 'demo-4',
+            name: 'Golden Palm Royal Palace',
+            location: 'Thrissur, Kerala',
+            city: 'Thrissur',
+            capacity: 750,
+            hall_type: 'Royal Palace',
+            cover_photo: 'https://images.unsplash.com/photo-1561501900-3701fa6a0864?auto=format&fit=crop&w=1000&q=80',
+            pricing: { base_price: 75000 }
+        },
+    ];
+
+    const dbHalls = (popularHalls?.length ? popularHalls : featuredHalls) || [];
+    const hallsToShow = dbHalls.length >= 6 ? dbHalls : [...dbHalls, ...sampleVenues.slice(0, 6 - dbHalls.length)];
 
     return (
         <CustomerLayout>
@@ -183,51 +227,55 @@ export default function Welcome({ popularHalls = [], featuredHalls = [], offers 
 
                     {hallsToShow.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {hallsToShow.slice(0, 6).map((hall) => (
-                                <Link
-                                    key={hall.id}
-                                    href={route('halls.show', hall.id)}
-                                    className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-slate-100 transition-all duration-300"
-                                >
-                                    <div className="relative h-52 overflow-hidden bg-slate-100">
-                                        <img
-                                            src={
-                                                hall.cover_photo ||
-                                                'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80'
-                                            }
-                                            alt={hall.name}
-                                            onError={(e) => {
-                                                e.target.src =
-                                                    'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80';
-                                            }}
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                        />
-                                        <div className="absolute top-3 left-3 bg-white/95 px-3 py-1 rounded-lg text-[11px] font-bold text-slate-800 uppercase tracking-wide">
-                                            {hall.hall_type || 'Banquet Hall'}
-                                        </div>
-                                    </div>
-                                    <div className="p-5 flex-1 flex flex-col">
-                                        <h3 className="text-lg font-black text-slate-900 group-hover:text-rose-600 transition-colors leading-snug">
-                                            {hall.name}
-                                        </h3>
-                                        <p className="text-slate-500 text-sm font-medium mt-1">
-                                            {hall.city || hall.location || 'Kerala'}
-                                            {hall.capacity ? ` · Up to ${Number(hall.capacity).toLocaleString()} guests` : ''}
-                                        </p>
-                                        <div className="mt-auto pt-4 border-t border-slate-100 flex justify-between items-center">
-                                            <div>
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                                                    From
-                                                </span>
-                                                <span className="text-lg font-black text-slate-900">
-                                                    ₹{(hall.pricing?.base_price || 35000).toLocaleString()}
-                                                </span>
+                            {hallsToShow.slice(0, 6).map((hall) => {
+                                const isDemo = typeof hall.id === 'string' && hall.id.startsWith('demo-');
+                                const cardHref = isDemo ? route('halls.index') : route('halls.show', hall.id);
+                                return (
+                                    <Link
+                                        key={hall.id}
+                                        href={cardHref}
+                                        className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-slate-100 transition-all duration-300"
+                                    >
+                                        <div className="relative h-52 overflow-hidden bg-slate-100">
+                                            <img
+                                                src={
+                                                    hall.cover_photo ||
+                                                    'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80'
+                                                }
+                                                alt={hall.name}
+                                                onError={(e) => {
+                                                    e.target.src =
+                                                        'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80';
+                                                }}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            />
+                                            <div className="absolute top-3 left-3 bg-white/95 px-3 py-1 rounded-lg text-[11px] font-bold text-slate-800 uppercase tracking-wide">
+                                                {hall.hall_type || 'Banquet Hall'}
                                             </div>
-                                            <span className="text-sm font-bold text-rose-600">View →</span>
                                         </div>
-                                    </div>
-                                </Link>
-                            ))}
+                                        <div className="p-5 flex-1 flex flex-col">
+                                            <h3 className="text-lg font-black text-slate-900 group-hover:text-rose-600 transition-colors leading-snug">
+                                                {hall.name}
+                                            </h3>
+                                            <p className="text-slate-500 text-sm font-medium mt-1">
+                                                {hall.city || hall.location || 'Kerala'}
+                                                {hall.capacity ? ` · Up to ${Number(hall.capacity).toLocaleString()} guests` : ''}
+                                            </p>
+                                            <div className="mt-auto pt-4 border-t border-slate-100 flex justify-between items-center">
+                                                <div>
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                        From
+                                                    </span>
+                                                    <span className="text-lg font-black text-slate-900">
+                                                        ₹{(hall.pricing?.base_price || 50000).toLocaleString()}
+                                                    </span>
+                                                </div>
+                                                <span className="text-sm font-bold text-rose-600">View →</span>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                );
+                            })}
                         </div>
                     ) : (
                         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
