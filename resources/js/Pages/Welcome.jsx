@@ -226,51 +226,64 @@ export default function Welcome({ popularHalls = [], featuredHalls = [], offers 
                     </div>
 
                     {hallsToShow.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {hallsToShow.slice(0, 6).map((hall) => {
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {hallsToShow.slice(0, 6).map((hall, idx) => {
                                 const isDemo = typeof hall.id === 'string' && hall.id.startsWith('demo-');
                                 const cardHref = isDemo ? route('halls.index') : route('halls.show', hall.id);
+                                const fallbackImage = venueImages[idx % venueImages.length];
+                                const isCarImage = hall.cover_photo && hall.cover_photo.toLowerCase().includes('car');
+                                const displayImage = isDemo || isCarImage || !hall.cover_photo ? fallbackImage : hall.cover_photo;
+
                                 return (
                                     <Link
                                         key={hall.id}
                                         href={cardHref}
-                                        className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-slate-100 transition-all duration-300"
+                                        className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/60 transition-all duration-300 transform hover:-translate-y-1"
                                     >
-                                        <div className="relative h-52 overflow-hidden bg-slate-100">
+                                        {/* Image Container with Badge */}
+                                        <div className="relative h-56 overflow-hidden bg-slate-100">
                                             <img
-                                                src={
-                                                    hall.cover_photo ||
-                                                    'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80'
-                                                }
+                                                src={displayImage}
                                                 alt={hall.name}
                                                 onError={(e) => {
-                                                    e.target.src =
-                                                        'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80';
+                                                    e.target.src = fallbackImage;
                                                 }}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                             />
-                                            <div className="absolute top-3 left-3 bg-white/95 px-3 py-1 rounded-lg text-[11px] font-bold text-slate-800 uppercase tracking-wide">
-                                                {hall.hall_type || 'Banquet Hall'}
+
+                                            {/* Top Pill Category Badge */}
+                                            <div className="absolute top-3 left-3 z-10">
+                                                <span className="inline-block bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-extrabold text-slate-800 uppercase tracking-widest shadow-sm">
+                                                    {hall.hall_type || 'BANQUET HALL'}
+                                                </span>
                                             </div>
                                         </div>
-                                        <div className="p-5 flex-1 flex flex-col">
-                                            <h3 className="text-lg font-black text-slate-900 group-hover:text-rose-600 transition-colors leading-snug">
-                                                {hall.name}
-                                            </h3>
-                                            <p className="text-slate-500 text-sm font-medium mt-1">
-                                                {hall.city || hall.location || 'Kerala'}
-                                                {hall.capacity ? ` · Up to ${Number(hall.capacity).toLocaleString()} guests` : ''}
-                                            </p>
-                                            <div className="mt-auto pt-4 border-t border-slate-100 flex justify-between items-center">
+
+                                        {/* Card Content */}
+                                        <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                                            <div>
+                                                <h3 className={`text-lg font-bold leading-tight transition-colors ${idx % 3 === 2 ? 'text-rose-600' : 'text-slate-900 group-hover:text-rose-600'}`}>
+                                                    {hall.name}
+                                                </h3>
+                                                <p className="text-xs font-semibold text-slate-400 mt-1.5">
+                                                    {hall.city || hall.location || 'Thiruvananthapuram'} · Up to {Number(hall.capacity || 500).toLocaleString()} guests
+                                                </p>
+                                            </div>
+
+                                            {/* Footer Price & View Arrow */}
+                                            <div className="pt-3 border-t border-slate-100 flex items-end justify-between">
                                                 <div>
-                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                                                        From
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block leading-none mb-1">
+                                                        FROM
                                                     </span>
-                                                    <span className="text-lg font-black text-slate-900">
+                                                    <span className="text-lg font-extrabold text-slate-900 leading-none">
                                                         ₹{(hall.pricing?.base_price || 50000).toLocaleString()}
                                                     </span>
                                                 </div>
-                                                <span className="text-sm font-bold text-rose-600">View →</span>
+
+                                                <span className="text-xs font-bold text-rose-600 group-hover:text-rose-700 flex items-center gap-1 transition-transform group-hover:translate-x-1">
+                                                    View →
+                                                </span>
                                             </div>
                                         </div>
                                     </Link>

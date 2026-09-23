@@ -162,9 +162,9 @@ export default function Index({ halls = [], allAmenities = [], filters = {}, fav
                                 <Link
                                     key={hall.id}
                                     href={route('halls.show', hall.id)}
-                                    className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-rose-600/5 transition-all duration-300"
+                                    className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/60 transition-all duration-300 transform hover:-translate-y-1"
                                 >
-                                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                                    <div className="relative h-56 overflow-hidden bg-slate-100">
                                         <img
                                             src={
                                                 hall.cover_photo ||
@@ -178,42 +178,46 @@ export default function Index({ halls = [], allAmenities = [], filters = {}, fav
                                             }}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                         />
-                                        <div className="absolute top-3 left-3 bg-white/95 px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-800 uppercase tracking-wide">
-                                            {hall.hall_type || 'Banquet'}
+                                        <div className="absolute top-3 left-3 z-10">
+                                            <span className="inline-block bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-extrabold text-slate-800 uppercase tracking-widest shadow-sm">
+                                                {hall.hall_type || 'BANQUET HALL'}
+                                            </span>
                                         </div>
                                         <button
                                             type="button"
                                             onClick={(e) => toggleFavourite(e, hall.id)}
-                                            className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-sm"
+                                            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-sm z-10"
                                             aria-label="Toggle favourite"
                                         >
-                                            <span className={`text-lg leading-none ${isFav ? 'text-rose-600' : 'text-slate-400'}`}>
+                                            <span className={`text-base leading-none ${isFav ? 'text-rose-600' : 'text-slate-400'}`}>
                                                 {isFav ? '♥' : '♡'}
                                             </span>
                                         </button>
                                     </div>
 
-                                    <div className="p-5 flex-1 flex flex-col space-y-1">
-                                        <div className="flex justify-between items-start gap-2">
-                                            <h3 className="font-black text-slate-900 text-base leading-snug group-hover:text-rose-600 transition-colors">
+                                    <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                                        <div>
+                                            <h3 className="text-lg font-bold text-slate-900 group-hover:text-rose-600 transition-colors leading-tight">
                                                 {hall.name}
                                             </h3>
-                                            <div className="flex items-center gap-1 text-sm font-semibold text-slate-700 shrink-0">
-                                                <span className="text-amber-500">★</span>
-                                                <span>{hall.rating || '4.9'}</span>
-                                            </div>
+                                            <p className="text-xs font-semibold text-slate-400 mt-1.5">
+                                                {hall.area ? `${hall.area}, ${hall.city}` : hall.city || 'Kerala'} · Up to {(hall.capacity || 500).toLocaleString()} guests
+                                            </p>
                                         </div>
-                                        <p className="text-slate-500 text-sm font-medium">
-                                            {hall.area ? `${hall.area}, ${hall.city}` : hall.city || 'Kerala'}
-                                        </p>
-                                        <p className="text-slate-500 text-sm">
-                                            Up to {(hall.capacity || 1000).toLocaleString()} guests
-                                        </p>
-                                        <div className="pt-3 mt-auto border-t border-slate-100">
-                                            <span className="font-black text-slate-900 text-lg">
-                                                ₹{(hall.pricing?.base_price || 35000).toLocaleString()}
+
+                                        <div className="pt-3 border-t border-slate-100 flex items-end justify-between">
+                                            <div>
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block leading-none mb-1">
+                                                    FROM
+                                                </span>
+                                                <span className="text-lg font-extrabold text-slate-900 leading-none">
+                                                    ₹{(hall.pricing?.base_price || 35000).toLocaleString()}
+                                                </span>
+                                            </div>
+
+                                            <span className="text-xs font-bold text-rose-600 group-hover:text-rose-700 flex items-center gap-1 transition-transform group-hover:translate-x-1">
+                                                View →
                                             </span>
-                                            <span className="text-slate-500 text-sm font-medium"> / event</span>
                                         </div>
                                     </div>
                                 </Link>
