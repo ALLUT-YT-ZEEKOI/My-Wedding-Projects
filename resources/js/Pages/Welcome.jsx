@@ -162,59 +162,7 @@ export default function Welcome({ popularHalls = [], featuredHalls = [], offers 
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-24">
-                {/* Categories */}
-                <section>
-                    <div className="mb-10 max-w-2xl">
-                        <span className="text-rose-600 font-black tracking-widest uppercase text-xs block mb-2">
-                            EVENT SELECTION
-                        </span>
-                        <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Browse by Event</h2>
-                        <p className="text-slate-500 font-medium mt-2">
-                            Explore luxury venues curated specifically for weddings, receptions, engagements, and corporate celebrations.
-                        </p>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {eventTypes.map((cat) => (
-                            <Link
-                                key={cat.name}
-                                href={route('halls.index', { event_type: cat.name })}
-                                className="group relative h-80 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-rose-600/10 transition-all duration-500 border border-slate-100 flex flex-col justify-between p-6"
-                            >
-                                <img
-                                    src={cat.img}
-                                    alt={cat.name}
-                                    onError={(e) => {
-                                        e.target.src = 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1000&q=80';
-                                    }}
-                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-900/10 transition-opacity group-hover:opacity-90" />
 
-                                {/* Top Pill */}
-                                <div className="relative z-10 self-start">
-                                    <span className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-slate-900 shadow-sm border border-slate-200/50">
-                                        <span>{cat.icon}</span>
-                                        <span>{cat.count}</span>
-                                    </span>
-                                </div>
-
-                                {/* Bottom Info */}
-                                <div className="relative z-10 space-y-1">
-                                    <h3 className="text-2xl font-black text-white group-hover:text-rose-300 transition-colors">
-                                        {cat.name}
-                                    </h3>
-                                    <p className="text-slate-300 font-medium text-xs">
-                                        {cat.tagline}
-                                    </p>
-                                    <div className="pt-2 flex items-center text-rose-400 font-bold text-xs group-hover:translate-x-1.5 transition-transform">
-                                        <span>Explore Venues</span>
-                                        <span className="ml-1">→</span>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                </section>
 
                 {/* Popular halls */}
                 <section>
