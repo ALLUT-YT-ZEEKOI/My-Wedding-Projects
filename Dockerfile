@@ -48,5 +48,9 @@ RUN touch /var/www/html/database/database.sqlite
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
 
-# Configure Apache to listen on Render's $PORT
-CMD sed -i "s/80/$PORT/g" /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf && php artisan migrate --force && apache2-foreground
+# Configure Apache to listen on Render's $PORT and run setup tasks on boot
+CMD sed -i "s/80/$PORT/g" /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf \
+    && php artisan key:generate --force \
+    && php artisan storage:link --force \
+    && php artisan migrate --force \
+    && apache2-foreground
