@@ -38,19 +38,23 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY . /var/www/html
 COPY --from=frontend /app/public/build /var/www/html/public/build
 
+# Copy .env.example to .env if .env does not exist
+RUN cp -n .env.example .env
+
 # Install PHP dependencies for production
 RUN composer install --no-dev --optimize-autoloader
 
-# Create SQLite DB file if missing
-RUN touch /var/www/html/database/database.sqlite
-
-# Set folder permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
-
-# Configure Apache to listen on Render's $PORT and run setup tasks on boot
-CMD sed -i "s/80/$PORT/g" /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf \
+# Create SQLite DB file and run key generation & storage link
+RUN touch /var/www/html/database/database.sqlite \
     && php artisan key:generate --force \
-    && php artisan storage:link --force \
+    && php artisan storage:link --force
+
+# Set full read/write permissions for storage, cache, and database
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/.env \
+    && chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/.env
+
+# Startup command: Bind port, run migrations & seeders, then start Apache
+CMD sed -i "s/80/$PORT/g" /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf \
     && php artisan migrate --force \
+    && php artisan db:seed --force \
     && apache2-foreground
