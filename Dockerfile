@@ -54,7 +54,7 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
     && chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/.env
 
 # Startup command: Bind port, run migrations & seeders, then start Apache
-CMD sed -i "s/80/$PORT/g" /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf \
+CMD PORT="${PORT:-80}" && sed -i "s/80/$PORT/g" /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf \
     && php artisan migrate --force \
     && php artisan db:seed --force \
     && apache2-foreground

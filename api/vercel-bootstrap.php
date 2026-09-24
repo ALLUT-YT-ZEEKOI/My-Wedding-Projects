@@ -12,7 +12,7 @@ $defaults = [
     'APP_KEY' => 'base64:q8T8+aaiZJO4PvNuWKBmzoKLQFjkjaoATPOZZthT4L4=',
     'APP_DEBUG' => 'true',
     'APP_URL' => 'https://my-wedding-five-beta.vercel.app',
-    'APP_VERSION' => '1.0.1',
+    'APP_VERSION' => '1.0.4',
     'APP_CONFIG_CACHE' => '/tmp/config.php',
     'APP_EVENTS_CACHE' => '/tmp/events.php',
     'APP_PACKAGES_CACHE' => '/tmp/packages.php',

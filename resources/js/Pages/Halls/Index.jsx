@@ -1,6 +1,7 @@
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import HeaderSearchBar from '@/Components/HeaderSearchBar';
-import { Head, Link, useForm, router } from '@inertiajs/react';
+import VenueCard from '@/Components/VenueCard';
+import { Head, useForm, router } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Index({ halls = [], allAmenities = [], filters = {}, favouriteHallIds = [] }) {
@@ -155,74 +156,19 @@ export default function Index({ halls = [], allAmenities = [], filters = {}, fav
                 </div>
 
                 {filteredHalls.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredHalls.map((hall) => {
-                            const isFav = favouriteHallIds.includes(hall.id);
-                            return (
-                                <Link
-                                    key={hall.id}
-                                    href={route('halls.show', hall.id)}
-                                    className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/60 transition-all duration-300 transform hover:-translate-y-1"
-                                >
-                                    <div className="relative h-56 overflow-hidden bg-slate-100">
-                                        <img
-                                            src={
-                                                hall.cover_photo ||
-                                                hall.img ||
-                                                'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1000&q=80'
-                                            }
-                                            alt={hall.name}
-                                            onError={(e) => {
-                                                e.target.src =
-                                                    'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1000&q=80';
-                                            }}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        />
-                                        <div className="absolute top-3 left-3 z-10">
-                                            <span className="inline-block bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-extrabold text-slate-800 uppercase tracking-widest shadow-sm">
-                                                {hall.hall_type || 'BANQUET HALL'}
-                                            </span>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={(e) => toggleFavourite(e, hall.id)}
-                                            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-sm z-10"
-                                            aria-label="Toggle favourite"
-                                        >
-                                            <span className={`text-base leading-none ${isFav ? 'text-rose-600' : 'text-slate-400'}`}>
-                                                {isFav ? '♥' : '♡'}
-                                            </span>
-                                        </button>
-                                    </div>
-
-                                    <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                                        <div>
-                                            <h3 className="text-lg font-bold text-slate-900 group-hover:text-rose-600 transition-colors leading-tight">
-                                                {hall.name}
-                                            </h3>
-                                            <p className="text-xs font-semibold text-slate-400 mt-1.5">
-                                                {hall.area ? `${hall.area}, ${hall.city}` : hall.city || 'Kerala'} · Up to {(hall.capacity || 500).toLocaleString()} guests
-                                            </p>
-                                        </div>
-
-                                        <div className="pt-3 border-t border-slate-100 flex items-end justify-between">
-                                            <div>
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block leading-none mb-1">
-                                                    FROM
-                                                </span>
-                                                <span className="text-lg font-extrabold text-slate-900 leading-none">
-                                                    ₹{(hall.pricing?.base_price || 35000).toLocaleString()}
-                                                </span>
-                                            </div>
-
-                                            <span className="text-xs font-bold text-rose-600 group-hover:text-rose-700 flex items-center gap-1 transition-transform group-hover:translate-x-1">
-                                                View →
-                                            </span>
-                                        </div>
-                                    </div>
-                                </Link>
-                            );
-                        })}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
+                        {filteredHalls.map((hall, idx) => (
+                            <VenueCard
+                                key={hall.id}
+                                hall={hall}
+                                href={route('halls.show', hall.id)}
+                                fallbackImage="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1000&q=80"
+                                featured={idx === 0 && !isFiltered}
+                                isFavourite={favouriteHallIds.includes(hall.id)}
+                                onToggleFavourite={toggleFavourite}
+                                ratingFallback={(4.7 + (idx % 3) * 0.1).toFixed(1)}
+                            />
+                        ))}
                     </div>
                 ) : (
                     <div className="py-16 text-center max-w-md mx-auto space-y-4 bg-white rounded-2xl border border-slate-100 px-8">

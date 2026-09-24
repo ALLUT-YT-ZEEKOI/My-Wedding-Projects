@@ -24,29 +24,24 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
-        $this->ensureVercelRuntime();
+        if (config('app.env') === 'production' || env('RENDER') || env('VERCEL') || request()->header('X-Forwarded-Proto') === 'https') {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
+        $this->ensureDatabaseReady();
     }
 
     /**
-     * Vercel lambdas only have a writable /tmp disk.
+     * Ensure database sqlite file exists and migrations are run on cloud environments.
      */
-    private function ensureVercelRuntime(): void
+    private function ensureDatabaseReady(): void
     {
-        if (! env('VERCEL')) {
-            return;
-        }
-
-        $viewPath = env('VIEW_COMPILED_PATH', '/tmp/views');
-        if (! is_dir($viewPath)) {
-            @mkdir($viewPath, 0755, true);
-        }
-
         if (env('DB_CONNECTION') !== 'sqlite') {
             return;
         }
 
-        $database = env('DB_DATABASE', '/tmp/database.sqlite');
-        if (! is_string($database) || $database === '') {
+        $database = env('DB_DATABASE', database_path('database.sqlite'));
+        if (! is_string($database) || $database === '' || $database === ':memory:') {
             return;
         }
 
@@ -56,7 +51,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         if (! file_exists($database)) {
-            touch($database);
+            @touch($database);
         }
 
         try {
@@ -65,7 +60,7 @@ class AppServiceProvider extends ServiceProvider
                 Artisan::call('db:seed', ['--force' => true]);
             }
         } catch (\Throwable) {
-            // First request may race a cold start; the next request will retry.
+            // Silently swallow initial setup race conditions
         }
     }
 }

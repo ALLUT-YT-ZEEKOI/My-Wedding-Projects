@@ -1,6 +1,16 @@
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import LocationAutocompleteInput from '@/Components/LocationAutocompleteInput';
+import VenueCard from '@/Components/VenueCard';
+
+const venueImages = [
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1545232979-fbfd4360976f?auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1000&q=80',
+];
 
 export default function Welcome({ popularHalls = [], featuredHalls = [], offers = [], reviews = [] }) {
     const { data, setData, get } = useForm({
@@ -212,21 +222,25 @@ export default function Welcome({ popularHalls = [], featuredHalls = [], offers 
                 <section>
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 gap-4">
                         <div>
-                            <span className="text-rose-600 font-black tracking-widest uppercase text-xs">Featured</span>
+                            <span className="text-rose-600 font-black tracking-[0.2em] uppercase text-[11px]">Handpicked</span>
                             <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight mt-2">
                                 Popular Venues
                             </h2>
+                            <p className="text-slate-500 text-sm font-medium mt-2 max-w-md">
+                                Cinematic spaces couples actually book — ratings, capacity, and starting price at a glance.
+                            </p>
                         </div>
                         <Link
                             href={route('halls.index')}
-                            className="text-sm font-bold text-rose-600 hover:text-rose-500"
+                            className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-rose-600 transition-colors"
                         >
-                            View all venues →
+                            View all venues
+                            <span aria-hidden="true">→</span>
                         </Link>
                     </div>
 
                     {hallsToShow.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
                             {hallsToShow.slice(0, 6).map((hall, idx) => {
                                 const isDemo = typeof hall.id === 'string' && hall.id.startsWith('demo-');
                                 const cardHref = isDemo ? route('halls.index') : route('halls.show', hall.id);
@@ -235,58 +249,15 @@ export default function Welcome({ popularHalls = [], featuredHalls = [], offers 
                                 const displayImage = isDemo || isCarImage || !hall.cover_photo ? fallbackImage : hall.cover_photo;
 
                                 return (
-                                    <Link
+                                    <VenueCard
                                         key={hall.id}
+                                        hall={hall}
                                         href={cardHref}
-                                        className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/60 transition-all duration-300 transform hover:-translate-y-1"
-                                    >
-                                        {/* Image Container with Badge */}
-                                        <div className="relative h-56 overflow-hidden bg-slate-100">
-                                            <img
-                                                src={displayImage}
-                                                alt={hall.name}
-                                                onError={(e) => {
-                                                    e.target.src = fallbackImage;
-                                                }}
-                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                            />
-
-                                            {/* Top Pill Category Badge */}
-                                            <div className="absolute top-3 left-3 z-10">
-                                                <span className="inline-block bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-extrabold text-slate-800 uppercase tracking-widest shadow-sm">
-                                                    {hall.hall_type || 'BANQUET HALL'}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {/* Card Content */}
-                                        <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                                            <div>
-                                                <h3 className={`text-lg font-bold leading-tight transition-colors ${idx % 3 === 2 ? 'text-rose-600' : 'text-slate-900 group-hover:text-rose-600'}`}>
-                                                    {hall.name}
-                                                </h3>
-                                                <p className="text-xs font-semibold text-slate-400 mt-1.5">
-                                                    {hall.city || hall.location || 'Thiruvananthapuram'} · Up to {Number(hall.capacity || 500).toLocaleString()} guests
-                                                </p>
-                                            </div>
-
-                                            {/* Footer Price & View Arrow */}
-                                            <div className="pt-3 border-t border-slate-100 flex items-end justify-between">
-                                                <div>
-                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block leading-none mb-1">
-                                                        FROM
-                                                    </span>
-                                                    <span className="text-lg font-extrabold text-slate-900 leading-none">
-                                                        ₹{(hall.pricing?.base_price || 50000).toLocaleString()}
-                                                    </span>
-                                                </div>
-
-                                                <span className="text-xs font-bold text-rose-600 group-hover:text-rose-700 flex items-center gap-1 transition-transform group-hover:translate-x-1">
-                                                    View →
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </Link>
+                                        image={displayImage}
+                                        fallbackImage={fallbackImage}
+                                        featured={idx === 0}
+                                        ratingFallback={(4.7 + (idx % 3) * 0.1).toFixed(1)}
+                                    />
                                 );
                             })}
                         </div>
